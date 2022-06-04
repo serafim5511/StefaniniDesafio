@@ -1,0 +1,240 @@
+﻿@model Domain.DTOs.Pessoa.Pessoa
+<div class="row">
+    <div class="col-12">
+        @using (Html.BeginForm("Editar", "Home", FormMethod.Post))
+        {
+            <div class="row">
+
+                <section class="col-lg-12">
+
+                    @if (ViewBag.Mensagem != "" && ViewBag.Mensagem != null)
+                    {
+                        <div class="small-box bg-info">
+                            <div class="inner" style="text-align:center">
+                                <p style="font-size:15px; color:white; font-weight:bold">@ViewBag.Mensagem</p>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="box box-info">
+                        @*<div class="cursor-pointer box-header with-border" onclick="Show()" data-widget="collapse">*@
+                        <div class="cursor-pointer box-header with-border">
+                            <h3 class="box-title">Dados Pessoais</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool">
+                                    <i class="fa fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+
+                            <div class="row">
+
+                                <div class="col-12 col-sm">
+                                    @Html.HiddenFor(model => model.Id)
+                                    <div class="form-group md-form">
+                                        @Html.TextBoxFor(txt => txt.Nome, new { @type = "text", @class = "form-control validate", @required = "required", @name = "Nome", @id = "Nome", @placeholder = "Nome" })
+                                    </div>
+                                    <div class="form-group md-form">
+                                        @Html.TextBoxFor(txt => txt.Idade, new { @type = "text", @class = "form-control validate", @required = "required", @name = "Idade", @id = "Idade", @placeholder = "Idade" })
+                                    </div>
+                                    <div class="form-group md-form">
+                                        @Html.TextBoxFor(txt => txt.CPF, new { @type = "text", @class = "form-control validate", @required = "required", @name = "Cpf", @id = "Cpf", @placeholder = "Cpf" })
+                                    </div>
+                                    <div class="form-group md-form">
+                                        @Html.TextBoxFor(txt => txt.Cidade.Nome, new { @type = "text", @class = "form-control validate", @required = "required", @name = "Cidade", @id = "Cidade", @placeholder = "Cidade" })
+                                    </div>                               
+                                    <div class="form-group md-form">
+                                        @Html.TextBoxFor(txt => txt.Cidade.UF, new { @type = "text", @class = "form-control validate", @required = "required", @name = "uf", @id = "uf", @placeholder = "uf" })
+                                    </div>
+
+                                    <div class="box-footer">
+                                        <button type="submit" class="btn btn-primary">Atualizar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        }
+    </div>
+</div>
+@section Scripts
+    {
+    <script>
+
+        $(document).ready(function () {
+            $.validator.addMethod("cep", function (value, element, arg) {
+                value = value.toString();
+                value = value.replace(/[^0-9]/g, "");
+                if (ValidaCep(value) && value !== "00000000") {
+
+                    return $("#cep").hasClass("validCEP");
+                }
+                return false;
+
+            });
+            function ValidaCep(cep) {
+                exp = /\d{2}\.\d{3}\-\d{3}/
+                if (!exp.test(cep.value) && cep.value != "00000-000")
+                    return true;
+                return false;
+            }
+            $('#cep').keyup(function () {
+
+                var el = $(this)
+                    .attr("name")
+                    .split("cep")[1];
+                if ($(this).val().length === 9) {
+                    preencherCEP();
+                }
+            });
+
+            function preencherCEP() {
+
+                var cep = $('[name^="cep"]').val();
+
+                $.getJSON("https://viacep.com.br/ws/" + cep + "/json/", function (dados) {
+
+                    try {
+                        console.log(dados);
+
+                        $('[name^="cep"]')
+                            .addClass("validCEP")
+                        $('[name="logradouro"]')
+                            .attr('Readonly', 'Readonly')
+                            .val(dados.logradouro)
+                        $('[name="bairro"]')
+                            .attr('Readonly', 'Readonly')
+                            .val(dados.bairro)
+                        $('[name="localidade"]')
+                            .attr('Readonly', 'Readonly')
+                            .val(dados.localidade)
+                        $('[name="uf"]')
+                            .attr('Readonly', 'Readonly')
+                            .val(dados.uf)
+
+                        $('[name="unidade"]')
+                            .attr('Readonly', 'Readonly')
+                            .val(dados.ddd)
+
+                        $('[name="ibge"]')
+                            .attr('Readonly', 'Readonly')
+                            .val(dados.ibge)
+
+                        $('[name="gia"]')
+                            .attr('Readonly', 'Readonly')
+                            .val(dados.gia)
+                        $('[name="complemento"]')
+                            .attr('Readonly', 'Readonly')
+                            .val(dados.complemento)
+                        if ($(".cep-error").length) {
+                            $(".cep-error").remove();
+                        }
+                    }
+
+                    catch (e) {
+
+                        console.log("Erro");
+
+                        $('[name="logradouroResidencial.Logradouro"]')
+                            .removeAttr("Readonly")
+                    }
+                });
+            }
+            $.validator.methods.marca = function (value, element) {
+                return element != null;
+            };
+            $.validator.methods.modelo = function (value, element) {
+                return element != null;
+            };
+            $.validator.methods.placa = function (value, element) {
+                return element != null;
+            };
+            $.validator.methods.eixos = function (value, element) {
+                return element != null;
+            };
+            /**/
+
+            $("#cep").mask("00000-000", { clearIfNotMatch: true });
+
+            $("form").validate({
+                rules: {
+                    Nome: { required: true, NomeSobrenome: true },
+                    marca: { required: true, marca: true },
+                    modelo: { required: true, modelo: true },
+                    placa: { required: true, placa: true },
+                    eixos: { required: true, eixos: true },
+                    cep: { required: true, cep: true },
+                    logradouro: { required: true },
+                    bairro: { required: true },
+                    localidade: { required: true },
+                    uf: { required: true }
+                },
+                messages: {
+                    Nome: { required: "Informe seu nome completo", NomeSobrenome: "Digite seu nome e sobrenome" },
+
+                    marca: {
+                        required: "Informe uma marca",
+                        marca: "Informe uma marca",
+                    },
+                    modelo: {
+                        required: "Informe um modelo",
+                        modelo: "Informe um modelo",
+                    },
+                    placa: {
+                        required: "Informe uma placa",
+                        placa: "Informe uma placa",
+                    },
+                    eixos: {
+                        required: "Informe uma eixos",
+                        eixos: "Informe uma eixos",
+                    },
+                    cep: {
+                        required: "Informe Cep",
+                        cep: "Informe um Cep válido"
+                    },
+                    logradouro: {
+                        required: "Informe o endereço"
+                    },
+                    bairro: {
+                        required: "Informe o bairro"
+                    },
+                    localidade: {
+                        required: "Informe a cidade"
+                    },
+                    uf: {
+                        required: "Informe a UF"
+                    }
+                }
+            });
+        });
+        $.validator.addMethod("Nome", function (value, element, arg) {
+
+            if (value.trim().split(' ').length == 1) {
+                return (value.match(/^[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]{0,}$/) && value.trim().split(' ').length == 2);
+            }
+            else {
+                return (value.trimRight().match(/^[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]{0,}$/) && value.trim().split(' ').length == 2
+                    || value.trimRight().match(/^[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]{0,}$/) && value.trim().split(' ').length == 3
+                    || value.trimRight().match(/^[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]{0,}$/) && value.trim().split(' ').length == 4
+                    || value.trimRight().match(/^[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]{0,}$/) && value.trim().split(' ').length == 5
+                    || value.trimRight().match(/^[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]{0,}$/) && value.trim().split(' ').length == 6);
+            }
+        });
+        $.validator.addMethod("NomeSobrenome", function (value, element, arg) {
+
+            if (value.trim().split(' ').length == 1) {
+                return (value.match(/^[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]{0,}$/) && value.trim().split(' ').length == 2);
+            }
+            else {
+                return (value.trimRight().match(/^[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]{0,}$/) && value.trim().split(' ').length == 2
+                    || value.trimRight().match(/^[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]{0,}$/) && value.trim().split(' ').length == 3
+                    || value.trimRight().match(/^[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]{0,}$/) && value.trim().split(' ').length == 4
+                    || value.trimRight().match(/^[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]{0,}$/) && value.trim().split(' ').length == 5
+                    || value.trimRight().match(/^[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]+\s+[a-zA-Z\u00C0-\u017F´]{0,}$/) && value.trim().split(' ').length == 6);
+            }
+        });
+    </script>
+}

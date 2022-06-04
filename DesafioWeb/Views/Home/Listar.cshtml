@@ -1,0 +1,60 @@
+﻿@model ApiResposta<List<EntitiesDesafio.Pessoa>>
+@{
+    ViewData["Title"] = "Controle de motoristas";
+}
+
+<div class="row setup-content">
+    @if (ViewBag.Mensagem != "" && ViewBag.Mensagem != null)
+    {
+        <div class="small-box bg-info">
+            <div class="inner" style="text-align:center">
+                <p style="font-size:15px; color:white; font-weight:bold">@ViewBag.Mensagem</p>
+            </div>
+        </div>
+    }
+    <div class="col text-center">
+        <div class="box box-info">
+
+            <div class="box-header with-border">
+                <h3 class="box-title" style="float:left; padding:15px;">Lista de usuários</h3>
+
+                <div class="box-body">
+
+                    <div class="table-responsive">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Nome </th>
+                                    <th>Marca</th>
+                                    <th>Modelo</th>
+                                    <th>Placa</th>
+                                    <th>Eixos</th>
+                                    <th>Edição</th>
+                                    <th>Exclusão</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (EntitiesDesafio.Pessoa dados in Model.Data)
+                                {
+                                    <tr>
+                                        <td>@dados.Nome</td>
+                                        <td>@dados.Cpf</td>
+                                        <td>@dados.Idade</td>
+                                        <td>@dados.Cidade.Nome</td>
+                                        <td>@dados.Cidade.UF</td>
+                                        <td>@Html.ActionLink("Editar", "Dados", "Home", new { id = @dados.Id }, new { @class = "btn btn-sm btn-info" })</td>
+                                        <td>@Html.ActionLink("Excluir", "Excluir", "Home", new { id = @dados.Id }, new { @class = "btn btn-sm btn-danger" })</td>
+
+                                    </tr>
+                                }
+                            </tbody>
+
+                        </table>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
